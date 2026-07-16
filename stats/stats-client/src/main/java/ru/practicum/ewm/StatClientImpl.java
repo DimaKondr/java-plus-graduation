@@ -6,8 +6,6 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.retry.backoff.FixedBackOffPolicy;
-import org.springframework.retry.policy.MaxAttemptsRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,25 +24,18 @@ public class StatClientImpl implements StatClient {
     private final RetryTemplate retryTemplate;
     private final String statsServiceId;
 
-    public StatClientImpl(DiscoveryClient discoveryClient, String statsServiceId) {
-        this.restClient = RestClient.builder()
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-        this.discoveryClient = discoveryClient;
-        this.statsServiceId = statsServiceId;
-        this.retryTemplate = setRetryPolicy();
-    }
-
-    //  конструктор для тестов
-    public StatClientImpl(RestClient.Builder builder,
-                          DiscoveryClient discoveryClient,
-                          String statsServiceId) {
+    public StatClientImpl(
+            RestClient.Builder builder,
+            DiscoveryClient discoveryClient,
+            RetryTemplate retryTemplate,
+            String statsServiceId
+    ) {
         this.restClient = builder
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
         this.discoveryClient = discoveryClient;
         this.statsServiceId = statsServiceId;
-        this.retryTemplate = setRetryPolicy();
+        this.retryTemplate = retryTemplate;
     }
 
     @Override
@@ -87,20 +78,6 @@ public class StatClientImpl implements StatClient {
                     "Параметры запроса: {}", dto);
             return new ArrayList<>();
         }
-    }
-
-    private RetryTemplate setRetryPolicy() {
-        RetryTemplate retryTemplate = new RetryTemplate();
-
-        FixedBackOffPolicy fixedBackOffPolicy = new FixedBackOffPolicy();
-        fixedBackOffPolicy.setBackOffPeriod(3000L);
-        retryTemplate.setBackOffPolicy(fixedBackOffPolicy);
-
-        MaxAttemptsRetryPolicy retryPolicy = new MaxAttemptsRetryPolicy();
-        retryPolicy.setMaxAttempts(3);
-        retryTemplate.setRetryPolicy(retryPolicy);
-
-        return retryTemplate;
     }
 
     private URI makeUri(String path) {

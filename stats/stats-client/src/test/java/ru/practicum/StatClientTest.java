@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestClient;
 import ru.practicum.ewm.HitDto;
 import ru.practicum.ewm.StatClientImpl;
@@ -31,7 +32,6 @@ class StatClientTest {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
 
-        String baseUrl = mockWebServer.url("").toString();
         String serviceId = "stats-service";
 
         discoveryClient = Mockito.mock(DiscoveryClient.class);
@@ -45,10 +45,12 @@ class StatClientTest {
         );
 
         Mockito.when(discoveryClient.getInstances(serviceId))
-                .thenReturn(java.util.List.of(serviceInstance));
+                .thenReturn(List.of(serviceInstance));
 
         RestClient.Builder builder = RestClient.builder();
-        statClient = new StatClientImpl(builder, /*baseUrl, */discoveryClient, serviceId);
+        RetryTemplate testRetryTemplate = new RetryTemplate();
+
+        statClient = new StatClientImpl(builder, discoveryClient, testRetryTemplate, serviceId);
     }
 
     @AfterEach
