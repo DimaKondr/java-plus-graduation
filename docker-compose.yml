@@ -16,13 +16,13 @@ services:
 
   ewm-db:
     image: postgres:16.1
-    container_name: postgres-ewm-main-db
+    container_name: postgres-ewm-core-db
     ports:
       - "5433:5432"
     environment:
       - POSTGRES_PASSWORD=ewm
       - POSTGRES_USER=ewm
-      - POSTGRES_DB=ewm-main-service
+      - POSTGRES_DB=ewm-core-service
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s

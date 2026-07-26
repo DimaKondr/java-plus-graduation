@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class HitMapper {
-
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public Hit toEntity(HitDto dto) {
@@ -30,4 +29,5 @@ public class HitMapper {
         dto.setTimestamp(hit.getTimestamp().format(FORMATTER));
         return dto;
     }
+
 }
