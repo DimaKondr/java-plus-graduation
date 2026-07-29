@@ -1,0 +1,66 @@
+server:
+  port: 0
+
+client:
+  name: stats-server
+
+stats:
+  client:
+    retry:
+      back-off-period: 3000
+      max-attempts: 3
+
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  jackson:
+    time-zone: UTC
+  sql:
+    init:
+      mode: always
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/ewm-core-service
+    username: ewm
+    password: ewm
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      event-service:
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
+        minimumNumberOfCalls: 1
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+  retry:
+    instances:
+      eventServiceRetry:
+        maxAttempts: 3
+        waitDuration: 1s
+        retryExceptions:
+          - ru.practicum.ewm.exception.microservice.RequestMicroserviceUnavailableException
+      userServiceRetry:
+        maxAttempts: 3
+        waitDuration: 1s
+        retryExceptions:
+          - ru.practicum.ewm.exception.microservice.UserMicroserviceUnavailableException
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:service-local-db
+    username: h2-ewm-main-service-local
+    password: password

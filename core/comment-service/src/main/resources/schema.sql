@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS comments
     user_id    BIGINT                                  NOT NULL,
     content    TEXT                                    NOT NULL,
     status     VARCHAR(20)                             NOT NULL DEFAULT 'PENDING',
-    created_at TIMESTAMP WITHOUT TIME ZONE             NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITHOUT TIME ZONE             NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
 
     -- Проверка допустимых значений статуса
     CONSTRAINT chk_comments_status CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED'))
