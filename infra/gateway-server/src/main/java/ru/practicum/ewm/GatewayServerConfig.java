@@ -11,15 +11,27 @@ public class GatewayServerConfig {
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("main_service_route", r -> r.path(
-                                "/admin/**",
-                                "/users/**",
-                                "/events/**",
-                                "/public/**",
+                .route("comment_service_route", r -> r.path(
+                                "/public/events/*/comments",
+                                "/users/*/events/*/comments/**",
+                                "/admin/comments/**")
+                        .uri("lb://comment-service"))
+                .route("request_service_route", r -> r.path(
+                                "/users/*/requests/**")
+                        .uri("lb://request-service"))
+                .route("user_service_route", r -> r.path(
+                                "/admin/users/**")
+                        .uri("lb://user-service"))
+                .route("event_service_route", r -> r.path(
+                                "/admin/events/**",
+                                "/users/*/events/**",
+                                "/admin/compilations/**",
+                                "/compilations/**",
+                                "/admin/categories/**",
                                 "/categories/**",
-                                "/compilations/**"
+                                "/events/**"
                         )
-                        .uri("lb://MAIN-SERVICE"))
+                        .uri("lb://event-service"))
                 .build();
     }
 
