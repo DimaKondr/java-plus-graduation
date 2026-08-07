@@ -12,7 +12,6 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestClient;
 import ru.practicum.ewm.HitDto;
-import ru.practicum.ewm.StatClientImpl;
 import ru.practicum.ewm.StatRequestParamDto;
 import ru.practicum.ewm.StatResponseDto;
 

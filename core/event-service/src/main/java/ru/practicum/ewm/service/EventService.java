@@ -2,6 +2,7 @@ package ru.practicum.ewm.service;
 
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
 
 import java.util.List;
 
@@ -33,5 +34,9 @@ public interface EventService {
     Boolean isEventExist(Long eventId);
 
     EventFullDto getEventByIdForMicroservice(Long eventId);
+
+    List<EventFullDto> getRecommendationForUser(Long userId);
+
+    void sendLikeOfEvent(Long userId, Long eventId, ActionTypeProto actionType);
 
 }

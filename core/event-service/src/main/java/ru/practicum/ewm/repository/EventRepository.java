@@ -19,6 +19,8 @@ public interface EventRepository extends JpaRepository<Event, Long>,
 
     List<Event> findAllByIdInOrderByIdAsc(List<Long> eventsIds);
 
+    List<Event> findAllByIdIn(List<Long> eventsIds);
+
     boolean existsByIdAndState(Long id, EventState state);
 
     @Query("SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END FROM Event e WHERE e.category.id = :categoryId")

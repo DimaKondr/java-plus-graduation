@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.CollectorGrpcClient;
 import ru.practicum.ewm.dto.request.CreateUpdateRequestDto;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.service.RequestService;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
 @RequestMapping("/users/{userId}/requests")
 public class RequestPrivateController {
     private final RequestService requestService;
+    private final CollectorGrpcClient collectorGrpcClient;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -25,11 +28,16 @@ public class RequestPrivateController {
             @RequestParam Long eventId
     ) {
         log.info("POST /users/{}/requests - создание запроса на участие:", userId);
-        return requestService.createRequest(
+        ParticipationRequestDto result = requestService.createRequest(
                 CreateUpdateRequestDto.builder()
                         .userId(userId)
                         .eventId(eventId).build()
         );
+        collectorGrpcClient.collectUserAction(userId, eventId, ActionTypeProto.ACTION_REGISTER);
+        log.info("Успешный публичный запрос пользователя на регистрацию в событии. " +
+                        "В Collector отправлена новая запись о регистрации пользователем с ID: {} в событии с ID: {}.",
+                userId, eventId);
+        return result;
     }
 
     @GetMapping

@@ -1,0 +1,18 @@
+server:
+  port: 0
+
+grpc:
+  server:
+    port: 0
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.LongSerializer
+      value-serializer: ru.practicum.ewm.broker.AggregatorAvroSerializer
+    consumer:
+      group-id: aggregator-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+      value-deserializer: ru.practicum.ewm.broker.UserActionDeserializer

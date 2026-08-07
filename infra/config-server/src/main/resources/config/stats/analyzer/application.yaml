@@ -1,0 +1,43 @@
+server:
+  port: 0
+
+grpc:
+  server:
+    port: 0
+  client:
+    hub-router:
+      address: static://localhost:59090
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
+
+
+spring:
+  sql:
+    init:
+      mode: always
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5434/ewm-stats-service
+    username: postgres-ewm-stats-service
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+custom:
+  kafka:
+    bootstrap-servers: localhost:9092
+  kafka-event-similarity:
+    event-similarity-consumer:
+      group-id: analyzer-event-similarity-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+      value-deserializer: ru.practicum.ewm.broker.EventSimilarityDeserializer
+  kafka-user-action:
+    user-action-consumer:
+      group-id: analyzer-user-action-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+      value-deserializer: ru.practicum.ewm.broker.UserActionDeserializer

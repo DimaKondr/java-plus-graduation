@@ -45,7 +45,7 @@ public class EventMapper {
     public EventFullDto eventToFullDto(
             Event event,
             Long confirmedRequests,
-            Long views,
+            Double rating,
             UserShortDto user
     ) {
         return EventFullDto.builder()
@@ -65,14 +65,14 @@ public class EventMapper {
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState().toString())
                 .title(event.getTitle())
-                .views(views)
+                .rating(rating)
                 .build();
     }
 
     public EventShortDto eventToShortDto(
             Event event,
             Long confirmedRequests,
-            Long views,
+            Double rating,
             UserShortDto user
     ) {
         return EventShortDto.builder()
@@ -84,7 +84,7 @@ public class EventMapper {
                 .initiator(user)
                 .paid(event.getPaid())
                 .title(event.getTitle())
-                .views(views)
+                .rating(rating)
                 .build();
     }
 

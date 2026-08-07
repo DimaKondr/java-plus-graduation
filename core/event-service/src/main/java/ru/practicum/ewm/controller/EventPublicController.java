@@ -1,6 +1,5 @@
 package ru.practicum.ewm.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -8,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.StatClient;
-import ru.practicum.ewm.HitDto;
-import ru.practicum.ewm.constants.Constants;
-import ru.practicum.ewm.dto.event.*;
+import ru.practicum.ewm.CollectorGrpcClient;
+import ru.practicum.ewm.dto.event.EventFullDto;
+import ru.practicum.ewm.dto.event.EventShortDto;
+import ru.practicum.ewm.dto.event.PublicEventRequestParam;
 import ru.practicum.ewm.service.EventService;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -24,7 +23,7 @@ import java.util.List;
 @Validated
 public class EventPublicController {
     private final EventService eventService;
-    private final StatClient statClient;
+    private final CollectorGrpcClient collectorGrpcClient;
 
     @GetMapping
     public List<EventShortDto> getEventsByPublicRequest(
@@ -41,18 +40,11 @@ public class EventPublicController {
             @RequestParam(defaultValue = "0")
                 @PositiveOrZero Integer from,
             @RequestParam(defaultValue = "10")
-                @Positive Integer size,
-            HttpServletRequest request
+                @Positive Integer size
     ) {
         log.info("Уровень Public. Получение списка из {} событий по необходимым параметрам. " +
                 "Пропускаем {} элементов. ", size, from);
-        HitDto hitDto = HitDto.builder()
-                .app("ewm-main-service")
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now().format(Constants.FORMATTER))
-                .build();
-        HitDto hitResult = statClient.postHit(hitDto);
+
         PublicEventRequestParam param = PublicEventRequestParam.builder()
                 .text(text)
                 .categories(categories)
@@ -64,29 +56,46 @@ public class EventPublicController {
                 .from(from)
                 .size(size)
                 .build();
+
         List<EventShortDto> result = eventService.getEventsByPublicRequest(param);
-        log.info("Успешный публичный запрос на получение списка событий по фильтрам. " +
-                "В статистику внесена новая запись: {}", hitResult);
+        log.info("Успешный публичный запрос на получение списка событий по фильтрам: {}.", result);
+
         return result;
     }
 
     @GetMapping("/{eventId}")
     public EventFullDto getEventByIdByPublicRequest(
             @PathVariable @Positive Long eventId,
-            HttpServletRequest request
+            @RequestHeader("X-EWM-USER-ID") Long userId
     ) {
-        log.info("Уровень Public. Получение данных о событии с ID: {}. ",eventId);
-        HitDto hitDto = HitDto.builder()
-                .app("ewm-main-service")
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now().format(Constants.FORMATTER))
-                .build();
-        HitDto hitResult = statClient.postHit(hitDto);
+        log.info("Уровень Public. Получение данных о событии с ID: {} пользователем с ID: {}.", eventId, userId);
+
         EventFullDto result = eventService.getEventByIdByPublicRequest(eventId);
+
+        collectorGrpcClient.collectUserAction(userId, eventId, ActionTypeProto.ACTION_VIEW);
         log.info("Успешный публичный запрос на получение события по ID. " +
-                "В статистику внесена новая запись: {}", hitResult);
+                "В Collector отправлена новая запись о просмотре пользователем с ID: {} события с ID: {}.",
+                userId, eventId);
+
         return result;
+    }
+
+    @GetMapping("/recommendations")
+    public List<EventFullDto> getRecommendationForUser(@RequestHeader("X-EWM-USER-ID") Long userId) {
+        log.info("Уровень Public. Получение списка рекомендованных событий для пользователя с ID: {}.", userId);
+        List<EventFullDto> result = eventService.getRecommendationForUser(userId);
+        log.info("Успешный публичный запрос на получение списка рекомендованных событий: {}.", result);
+        return result;
+    }
+
+    @PutMapping("/{eventId}/like")
+    public void sendLikeOfEvent(@PathVariable @Positive Long eventId,
+                                @RequestHeader("X-EWM-USER-ID") Long userId) {
+        log.info("Уровень Public. Пользователь с ID: {} поставил лайк событию с ID: {}.", userId, eventId);
+        eventService.sendLikeOfEvent(userId, eventId, ActionTypeProto.ACTION_LIKE);
+        log.info("Успешный публичный запрос на применения лайка событию. " +
+                "В Collector отправлена новая запись о постановке лайка событию с ID: {} пользователем с ID: {}.",
+                eventId, userId);
     }
 
 }
