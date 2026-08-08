@@ -39,7 +39,7 @@ class EventFullDtoJsonTest {
             .requestModeration(true)
             .state("PUBLISHED")
             .title("летающие слоны")
-            .views(567L)
+            .rating(567.0)
             .build();
 
     @Test
@@ -67,7 +67,7 @@ class EventFullDtoJsonTest {
         assertThat(result).extractingJsonPathBooleanValue("$.requestModeration").isEqualTo(true);
         assertThat(result).extractingJsonPathStringValue("$.state").isEqualTo("PUBLISHED");
         assertThat(result).extractingJsonPathStringValue("$.title").isEqualTo("летающие слоны");
-        assertThat(result).extractingJsonPathNumberValue("$.views").isEqualTo(567);
+        assertThat(result).extractingJsonPathNumberValue("$.rating").isEqualTo(567.0);
     }
 
 }

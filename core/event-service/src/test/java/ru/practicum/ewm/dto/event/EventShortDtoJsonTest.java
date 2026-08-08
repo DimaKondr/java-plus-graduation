@@ -31,7 +31,7 @@ class EventShortDtoJsonTest {
             .initiator(initiator)
             .paid(true)
             .title("поющие электронные гитары")
-            .views(64516L)
+            .rating(64516.0)
             .build();
 
     @Test
@@ -49,7 +49,7 @@ class EventShortDtoJsonTest {
         assertThat(result).extractingJsonPathStringValue("$.initiator.name").isEqualTo("Коля");
         assertThat(result).extractingJsonPathBooleanValue("$.paid").isEqualTo(true);
         assertThat(result).extractingJsonPathStringValue("$.title").isEqualTo("поющие электронные гитары");
-        assertThat(result).extractingJsonPathNumberValue("$.views").isEqualTo(64516);
+        assertThat(result).extractingJsonPathNumberValue("$.rating").isEqualTo(64516.0);
     }
 
 }

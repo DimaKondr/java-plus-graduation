@@ -70,7 +70,7 @@ class EventPrivateControllerTest {
             .requestModeration(true)
             .state("PUBLISHED")
             .title("летающие слоны")
-            .views(567L)
+            .rating(567.0)
             .build();
 
     @Test
@@ -108,7 +108,7 @@ class EventPrivateControllerTest {
                 .andExpect(jsonPath("$.requestModeration", is(fullDtoForResponse.getRequestModeration())))
                 .andExpect(jsonPath("$.state", is(fullDtoForResponse.getState())))
                 .andExpect(jsonPath("$.title", is(fullDtoForResponse.getTitle())))
-                .andExpect(jsonPath("$.views", is(fullDtoForResponse.getViews()), Long.class));
+                .andExpect(jsonPath("$.rating", is(fullDtoForResponse.getRating()), Double.class));
 
         verify(eventService, times(1)).addEvent(1L, newEventDto);
     }
@@ -124,7 +124,7 @@ class EventPrivateControllerTest {
                 .initiator(initiator)
                 .paid(true)
                 .title("летающие слоны")
-                .views(567L)
+                .rating(567.0)
                 .build();
 
         EventShortDto dto2 = EventShortDto.builder()
@@ -136,7 +136,7 @@ class EventPrivateControllerTest {
                 .initiator(initiator)
                 .paid(true)
                 .title("поющие электронные гитары")
-                .views(64516L)
+                .rating(64516.0)
                 .build();
 
         List<EventShortDto> dtos = List.of(dto1, dto2);
@@ -161,7 +161,7 @@ class EventPrivateControllerTest {
                 .andExpect(jsonPath("$.[0].initiator.name", is(dto1.getInitiator().getName())))
                 .andExpect(jsonPath("$.[0].paid", is(dto1.getPaid())))
                 .andExpect(jsonPath("$.[0].title", is(dto1.getTitle())))
-                .andExpect(jsonPath("$.[0].views", is(dto1.getViews()), Long.class))
+                .andExpect(jsonPath("$.[0].rating", is(dto1.getRating()), Double.class))
 
                 .andExpect(jsonPath("$.[1].annotation", is(dto2.getAnnotation())))
                 .andExpect(jsonPath("$.[1].category.id", is(dto2.getCategory().getId()), Long.class))
@@ -173,7 +173,7 @@ class EventPrivateControllerTest {
                 .andExpect(jsonPath("$.[1].initiator.name", is(dto2.getInitiator().getName())))
                 .andExpect(jsonPath("$.[1].paid", is(dto2.getPaid())))
                 .andExpect(jsonPath("$.[1].title", is(dto2.getTitle())))
-                .andExpect(jsonPath("$.[1].views", is(dto2.getViews()), Long.class));
+                .andExpect(jsonPath("$.[1].rating", is(dto2.getRating()), Double.class));
 
         verify(eventService, times(1)).getEventsOfUser(1L, 0, 10);
     }
@@ -212,7 +212,7 @@ class EventPrivateControllerTest {
                 .andExpect(jsonPath("$.requestModeration", is(fullDtoForResponse.getRequestModeration())))
                 .andExpect(jsonPath("$.state", is(fullDtoForResponse.getState())))
                 .andExpect(jsonPath("$.title", is(fullDtoForResponse.getTitle())))
-                .andExpect(jsonPath("$.views", is(fullDtoForResponse.getViews()), Long.class));
+                .andExpect(jsonPath("$.rating", is(fullDtoForResponse.getRating()), Double.class));
 
         verify(eventService, times(1)).getEventById(1L, 7L);
     }
