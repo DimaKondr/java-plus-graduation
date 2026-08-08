@@ -14,23 +14,16 @@
     <artifactId>stats</artifactId>
     <packaging>pom</packaging>
 
-    <name>Stat Aggregator</name>
-    <description>Statistics modules aggregator for Explore With Me</description>
-
     <modules>
-        <module>stats-dto</module>
+        <module>aggregator</module>
+        <module>analyzer</module>
+        <module>collector</module>
+        <module>serialization</module>
         <module>stats-client</module>
-        <module>stats-server</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>ru.practicum</groupId>
-                <artifactId>stats-dto</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>ru.practicum</groupId>
                 <artifactId>stats-client</artifactId>
